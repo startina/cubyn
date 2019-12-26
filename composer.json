@@ -3,7 +3,7 @@
     "description": "cubyn API 对接",
     "license": "MIT",
     "require": {
-        "php": ">=5.3",
+        "php": ">=7.0",
         "php-curl-class/php-curl-class": "^8.6",
         "ext-curl": "*"
     },
