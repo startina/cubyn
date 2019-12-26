@@ -4,8 +4,7 @@
     "license": "MIT",
     "require": {
         "php": ">=7.1.0",
-        "php-curl-class/php-curl-class": "*",
-        "ext-curl": "*"
+        "php-curl-class/php-curl-class": "^8.6"
     },
     "autoload": {
         "psr-4": {
