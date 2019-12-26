@@ -1,0 +1,15 @@
+{
+    "name": "startina/cubyn",
+    "description": "cubyn API 对接",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.1.0",
+        "php-curl-class/php-curl-class": "^8.6",
+        "ext-curl": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "startina\\cubyn\\": "src/"
+        }
+    }
+}

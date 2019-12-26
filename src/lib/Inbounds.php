@@ -2,25 +2,38 @@
 namespace startina\cubyn\lib;
 use startina\cubyn\Basic;
 
-class Product extends Basic {
+class Inbounds extends Basic {
     /**
-     * @desc 产品目录
-     * @url https://developers-storage.cubyn.com/#step-2-track-inventory
-     * @param $query string SKU名称模糊搜索
+     * @desc 获取发货单信息
+     * @url https://shipper.cubyn.com/inbounds
+     * @param $filters array 过滤项
      * @param $sort array 排序字段
      * @param $offset int 起始位置
      * @param $limit int 每页数量
      * @return bool|object|null
      * @throws \ErrorException
      */
-    public function get(string $query = '', array $sort = ['sku' => 'ASC'], int $offset = 0, int $limit = null)
+    public function get(array $filters = [], array $includes = ['packingUnitsQuantity'], array $sort = ['createdAt' => 'DESC'], int $offset = 0, int $limit = null)
     {
         $params = [];
-        $params['query'] = $query;
+        $params['filters'] = $filters;
+        $params['includes'] = $includes;
         $params['sort'] = $sort;
         $params['offset'] = $offset;
         $params['limit'] = $limit;
         return $this->request('product-catalog/products/', $params);
     }
 
+    /**
+     * @desc 发送库存
+     * @url https://developers-storage.cubyn.com/#step-1-send-inventory
+     * @param $packingUnits
+     * @param $items
+     * @return bool|object|null
+     * @throws \ErrorException
+     */
+    public function send($packingUnits, $items)
+    {
+        return $this->request('storage-inbound/orders', ['packingUnits' => $packingUnits, 'items' => $items], 'post');
+    }
 }

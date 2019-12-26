@@ -1,11 +1,9 @@
 <?php
-namespace startina\cubyn\lib;
-use startina\cubyn\Basic;
+namespace startina\cubyn\test;
 
 class Product extends Basic {
+
     /**
-     * @desc 产品目录
-     * @url https://developers-storage.cubyn.com/#step-2-track-inventory
      * @param $query string SKU名称模糊搜索
      * @param $sort array 排序字段
      * @param $offset int 起始位置
@@ -13,9 +11,8 @@ class Product extends Basic {
      * @return bool|object|null
      * @throws \ErrorException
      */
-    public function get(string $query = '', array $sort = ['sku' => 'ASC'], $offset = 0, $limit = 50)
+    public function get(string $query = '', array $sort = ['sku' => 'ASC'], int $offset = 0, int $limit = null)
     {
-        return $this->request('product-catalog/products/');
+        return $this->client->product()->get($query, $sort, $offset, $limit);
     }
-
 }
