@@ -1,7 +1,7 @@
 <?php
 namespace startina\cubyn\test;
 
-class Product extends Basic {
+class Inventory extends Basic {
 
     /**
      * @param $query string SKU名称模糊搜索

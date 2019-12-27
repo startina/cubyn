@@ -21,9 +21,12 @@ class Inbounds extends Basic {
         $params['sort'] = $sort;
         $params['offset'] = $offset;
         $params['limit'] = $limit;
-        return $this->request('product-catalog/products/', $params);
+        return $this->request('storage-inbound/orders/', $params);
     }
-
+    public function getBarCodes($pid) {
+        $uri = "storage-inbound/orders/{$pid}/barcodes";
+        return $this->request($uri);
+    }
     /**
      * @desc 发送库存
      * @url https://developers-storage.cubyn.com/#step-1-send-inventory

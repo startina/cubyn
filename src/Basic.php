@@ -10,6 +10,7 @@ abstract class Basic {
     protected $host = 'https://api.cubyn.com/v2/';
     protected $errorMsg = '';
     protected $response = null;
+    protected $totalCount = 0;  //  列表总数量
 
     /**
      * Client constructor.
@@ -52,6 +53,7 @@ abstract class Basic {
         $curl->{$method}($url, $params);
         $curl->close();
         $this->response = $curl->response;
+        $this->totalCount = $curl->responseHeaders['x-total-count'] ?? 0;
 
         switch ($curl->httpStatusCode) {
             case 0:
@@ -78,6 +80,14 @@ abstract class Basic {
     public function getError()
     {
         return $this->errorMsg;
+    }
+
+    /**
+     * 获取列表总数量
+     * @return int
+     */
+    public function getTotalCount() {
+        return $this->totalCount;
     }
 
 

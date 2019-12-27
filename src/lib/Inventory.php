@@ -2,7 +2,7 @@
 namespace startina\cubyn\lib;
 use startina\cubyn\Basic;
 
-class Product extends Basic {
+class Inventory extends Basic {
     /**
      * @desc 产品目录
      * @url https://developers-storage.cubyn.com/#step-2-track-inventory

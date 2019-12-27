@@ -2,11 +2,12 @@
 namespace startina\cubyn;
 use startina\cubyn\lib\Inbounds;
 use startina\cubyn\lib\Inventory;
-use startina\cubyn\lib\Product;
+use startina\cubyn\lib\Orders;
 
 /**
  * @method Inbounds inbounds()
- * @method Product product()
+ * @method Inventory inventory()
+ * @method Orders orders()
  * Class Client
  * @package startina\cubyn
  */
