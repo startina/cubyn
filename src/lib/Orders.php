@@ -20,7 +20,7 @@ class Orders extends Basic {
         $params['sort'] = $sort;
         $params['offset'] = $offset;
         $params['limit'] = $limit;
-        return $this->request('search/parcel', $params);
+        return $this->request('parcels', $params);
     }
 
     /**
