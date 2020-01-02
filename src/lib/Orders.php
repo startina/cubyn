@@ -13,7 +13,7 @@ class Orders extends Basic {
      * @return bool|object|null
      * @throws \Exception|\ErrorException
      */
-    public function get(array $filters = [], array $sort = ['id' => 'DESC'], int $offset = 0, int $limit = null)
+    public function get(int $offset = 0, int $limit = null, array $filters = [], array $sort = ['id' => 'DESC'])
     {
         $params = [];
         $params['filters'] = $filters;
