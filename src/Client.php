@@ -14,17 +14,6 @@ use startina\cubyn\lib\Orders;
 class Client extends Basic {
     protected $ins = [];
 
-    /**
-     * @desc 获取接口基本信息
-     * @url https://developers-storage.cubyn.com/#authentication
-     * @return bool|object|null
-     * @throws \ErrorException
-     */
-    public function info()
-    {
-        return $this->request('');
-    }
-
     public function __call($name, $arguments)
     {
         $nameSpace = __NAMESPACE__.'\lib';

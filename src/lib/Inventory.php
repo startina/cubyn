@@ -11,9 +11,9 @@ class Inventory extends Basic {
      * @param $offset int 起始位置
      * @param $limit int 每页数量
      * @return bool|object|null
-     * @throws \ErrorException
+     * @throws \Exception|\ErrorException
      */
-    public function get(string $query = '', array $sort = ['sku' => 'ASC'], int $offset = 0, int $limit = null)
+    public function get(int $offset = 0, int $limit = null, string $query = '', array $sort = ['sku' => 'ASC'])
     {
         $params = [];
         $params['query'] = $query;

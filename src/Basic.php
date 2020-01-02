@@ -1,6 +1,7 @@
 <?php
 namespace startina\cubyn;
 use Curl\Curl;
+use ErrorException;
 
 abstract class Basic {
     protected $connectTimeout = 0;  // 网络超时时间
@@ -11,6 +12,9 @@ abstract class Basic {
     protected $errorMsg = '';
     protected $response = null;
     protected $totalCount = 0;  //  列表总数量
+    protected $info = null;
+    protected $token = null;
+    protected $tokenExpired = 0;
 
     /**
      * Client constructor.
@@ -25,9 +29,15 @@ abstract class Basic {
             $this->connectTimeout = $connectTimeout;
         }
     }
+
+    /**
+     * @param $msg
+     * @throws \Exception
+     */
     protected function setError($msg)
     {
         $this->errorMsg = $msg;
+        throw new \Exception($msg);
     }
     protected function reinitErrorTimes()
     {
@@ -39,38 +49,46 @@ abstract class Basic {
      * @param array $params 请求参数
      * @param string $method 请求方式，支持[get,post,put,delete等]
      * @return bool|object|null
-     * @throws \ErrorException
+     * @throws \Exception|\ErrorException
      */
     protected function request(string $uri, array $params = [], string $method = 'get')
     {
-        $url = $this->host.$uri;
-        $curl = new Curl();
-        $curl->setTimeout($this->connectTimeout);
-        $curl->setHeader('X-Application', $this->key);
-        $curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
-        $curl->setOpt(CURLOPT_SSL_VERIFYHOST, false);
-        $curl->setOpt(CURLOPT_ENCODING,'gzip');
-        $curl->{$method}($url, $params);
-        $curl->close();
-        $this->response = $curl->response;
-        $this->totalCount = $curl->responseHeaders['x-total-count'] ?? 0;
-
-        switch ($curl->httpStatusCode) {
-            case 0:
-                // 请求超时
-                if ($this->errorTimes++ < $this->errorTimes) {
-                    return $this->request($uri, $params, $method);
-                } else {
-                    $this->setError($curl->message);
+        try {
+            $url = $this->host.$uri;
+            $curl = new Curl();
+            $curl->setTimeout($this->connectTimeout);
+            $curl->setHeader('X-Application', $this->key);
+            $curl->setOpt(CURLOPT_SSL_VERIFYPEER, false);
+            $curl->setOpt(CURLOPT_SSL_VERIFYHOST, false);
+            $curl->setOpt(CURLOPT_ENCODING,'gzip');
+            $curl->{$method}($url, $params);
+            $curl->close();
+            $this->response = $curl->response;
+            $this->totalCount = $curl->responseHeaders['x-total-count'] ?? 0;
+            switch ($curl->httpStatusCode) {
+                case 0:
+                    // 请求超时
+                    if ($this->errorTimes++ < $this->errorTimes) {
+                        return $this->request($uri, $params, $method);
+                    } else {
+                        $this->setError($curl->message);
+                        return false;
+                    }
+                case 200:
+                    $this->reinitErrorTimes();
+                    return $curl->response;
+                default:
+                    $this->reinitErrorTimes();
+                    if (is_object($curl->response) && !empty($curl->response->message)) {
+                        $this->setError($curl->response->message);
+                    } else {
+                        $this->setError('API接口-未知错误');
+                    }
                     return false;
-                }
-            case 200:
-                $this->reinitErrorTimes();
-                return $curl->response;
-            default:
-                $this->reinitErrorTimes();
-                $this->setError('未知错误');
-                return false;
+            }
+        } catch (\Exception $exception) {
+            $this->setError($exception->getMessage());
+            return  false;
         }
     }
 
@@ -90,34 +108,38 @@ abstract class Basic {
         return $this->totalCount;
     }
 
-
-
-
-
-
+    /**
+     * @desc 获取接口基本信息
+     * @url https://developers-storage.cubyn.com/#authentication
+     * @return bool|object|null
+     * @throws \Exception|\ErrorException
+     */
+    public function info()
+    {
+        if (!$this->info) {
+            $this->info = $this->request('');
+        }
+        return  $this->info;
+    }
 
     /**
-     * @desc 创建包裹
-     * @url https://developers-storage.cubyn.com/#step-3-create-parcels
-     * @param $firstName
-     * @param $lastName
-     * @param $address
-     * @param $orderRef
-     * @param $objectCount
-     * @param $items
-     * @return bool|object|null
-     * @throws \ErrorException
+     * 获取token令牌。用于部分接口所需，如下载
+     * @param string $type
+     * @return |null
+     * @throws \Exception|\ErrorException
      */
-    public function createParcels($firstName, $lastName, $address, $orderRef, $objectCount, $items)
-    {
-        $params = [];
-        $params['firstName'] = $firstName;
-        $params['lastName'] = $lastName;
-        $params['address'] = $address;
-        $params['orderRef'] = $orderRef;
-        $params['objectCount'] = $objectCount;
-        $params['items'] = $items;
-        return $this->request('parcels', [], 'post');
+    public function getToken($type = 'short') {
+        if (!$this->token || (time() > $this->tokenExpired)) {
+            $uri = 'tokens';
+            $params = [];
+            $params['type'] = $type;
+            $params['userId'] = $this->info()->auth->id;
+            $obj = $this->request($uri, $params, 'post');
+            $this->token = $obj->token;
+            $this->tokenExpired = time() + $obj->ttl/1000 - 3;  //  提前3s过期
+        }
+        return $this->token;
     }
+
 
 }
