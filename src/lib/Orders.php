@@ -26,17 +26,21 @@ class Orders extends Basic {
     /**
      * 获取订单列表，包括IMEI/序列号数据
      * @param array $status
+     * @param string $keywords 关键字/订单号
      * @param array $sort
      * @param int $offset
      * @param int|null $limit
      * @return bool|object|null
      * @throws \Exception|\ErrorException
      */
-    public function getSearch(int $offset = 0, int $limit = null, array $status = ['CREATED','PICKED','SHIPPED','CARRIER_IN_TRANSIT','CARRIER_OUT_FOR_DELIVERY','CARRIER_EXCEPTION','CUBYN_EXCEPTION','CARRIER_FAILED_ATTEMPT','CARRIER_DELIVERED'])
+    public function getSearch(int $offset = 0, int $limit = null, $keywords = '', array $status = ['CREATED','PICKED','SHIPPED','CARRIER_IN_TRANSIT','CARRIER_OUT_FOR_DELIVERY','CARRIER_EXCEPTION','CUBYN_EXCEPTION','CARRIER_FAILED_ATTEMPT','CARRIER_DELIVERED'])
     {
         $params = [];
         if ($status) {
             $params['status'] = implode(',', $status);
+        }
+        if ($keywords) {
+            $params['q'] = $keywords;
         }
         $params['offset'] = $offset;
         $params['limit'] = $limit;
